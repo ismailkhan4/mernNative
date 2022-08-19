@@ -40,6 +40,8 @@ const userSchema = new mongoose.Schema({
   },
   otp: Number,
   otp_expiry: Date,
+  reset_password_otp: Number,
+  reset_password_otp_expiry: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -56,7 +58,9 @@ userSchema.methods.getJWTToken = function () {
 };
 
 userSchema.methods.comparePassword = async function (password) {
-  return bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password);
 };
+
+userSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 });
 
 export const User = mongoose.model('User', userSchema);
