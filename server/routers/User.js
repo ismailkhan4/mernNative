@@ -33,6 +33,6 @@ router.route('/updateprofile').put(isAuthenticated, updateProfile);
 router.route('/updatepassword').put(isAuthenticated, updatePassword);
 
 router.route('/forgotpassword').post(forgotPassword);
-router.route('/resetpassword').post(resetPassword);
+router.route('/resetpassword').put(resetPassword);
 
 export default router;
