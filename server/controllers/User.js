@@ -65,3 +65,29 @@ export const verify = async (req, res) => {
     console.error('error1123', error);
   }
 };
+
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email }).select('+password');
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid Email or Password' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid Email or Password' });
+    }
+
+    sendToken(res, user, 200, 'Login successfull.');
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
