@@ -40,6 +40,8 @@ const userSchema = new mongoose.Schema({
   },
   otp: Number,
   otp_expiry: Date,
+  reset_password_otp: Number,
+  reset_password_otp_expiry: Date,
 });
 
 userSchema.pre('save', async function (next) {
