@@ -41,3 +41,27 @@ export const register = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const verify = async (req, res) => {
+  try {
+    const otp = Number(req.body.otp);
+    const user = await User.findById(req.user._id);
+
+    if (user.otp !== otp || user.otp_expiry < Date.now()) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid OTP or has been expired.' });
+    }
+
+    user.verified = true;
+    user.otp = null;
+    user.otp_expiry = null;
+
+    await user.save();
+
+    sendToken(res, user, 200, 'Account Verified');
+  } catch (error) {
+    res.stats(500).json({ success: false, message: error.message });
+    console.error('error1123', error);
+  }
+};
