@@ -174,3 +174,65 @@ export const updateTask = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getMyProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    sendToken(res, user, 201, `Welcome back ${user.name}`);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    const { name } = req.body;
+    // const { avatar } = req.files;
+    console.log(user);
+    console.log(name);
+
+    if (name) {
+      user.name = name;
+    }
+    await user.save();
+    // if (avatar) {
+    // }
+    res
+      .status(200)
+      .json({ success: true, message: 'Profile updated successfully.' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updatePassword = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('+password');
+
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Please enter all fields.' });
+    }
+    const isMatch = await user.comparePassword(oldPassword);
+
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid Old Password.' });
+    }
+
+    user.password = newPassword;
+
+    await user.save();
+    res
+      .status(200)
+      .json({ success: true, message: 'Password updated successfully.' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
